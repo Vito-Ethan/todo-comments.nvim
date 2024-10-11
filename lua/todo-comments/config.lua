@@ -21,14 +21,15 @@ local defaults = {
       icon = " ", -- icon used for the sign, and in search results
       color = "error", -- can be a hex color, or a named color (see below)
       alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
+      fg = "NONE", -- text color
       -- signs = false, -- configure signs for some keywords individually
     },
-    TODO = { icon = " ", color = "info" },
-    HACK = { icon = " ", color = "warning" },
-    WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-    PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-    NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
-    TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+    TODO = { icon = " ", color = "info", fg = "NONE" },
+    HACK = { icon = " ", color = "warning", fg = "NONE" },
+    WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" }, fg = "NONE" },
+    PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" }, fg = "NONE" },
+    NOTE = { icon = " ", color = "hint", alt = { "INFO" }, fg = "NONE" },
+    TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" }, fg = "NONE" },
   },
   gui_style = {
     fg = "NONE", -- The gui style to use for the fg highlight group.
@@ -190,8 +191,14 @@ function M.colors()
     if not hex then
       error("Todo: no color for " .. kw)
     end
-    local fg = Util.maximize_contrast(hex, normal_fg, normal_bg)
-
+    -- local fg = Util.maximize_contrast(hex, normal_fg, normal_bg)
+    -- Check if fg is set to "NONE" and calculate accordingly
+    local fg
+    if opts.fg == "NONE" then
+      fg = Util.maximize_contrast(hex, normal_fg, normal_bg)
+    else
+      fg = opts.fg
+    end
     vim.cmd("hi def TodoBg" .. kw .. " guibg=" .. hex .. " guifg=" .. fg .. " gui=" .. bg_gui)
     vim.cmd("hi def TodoFg" .. kw .. " guibg=NONE guifg=" .. hex .. " gui=" .. fg_gui)
     vim.cmd("hi def TodoSign" .. kw .. " guibg=" .. sign_bg .. " guifg=" .. hex .. " gui=NONE")
